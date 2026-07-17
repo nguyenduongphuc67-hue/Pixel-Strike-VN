@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VOID RUNNER</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070914; --bg2:#0d1226; --bg3:#111830;
+  --cyan:#4ff2ff; --cyan2:#2fd4d9; --magenta:#ff3d9a; --amber:#ffb020; --green:#3dffb0;
+  --diamond:#a78bfa; --diamond2:#7c3aed;
+  --ink:#dfe9ff; --dim:#5c6a94; --panel:rgba(11,15,34,.88);
+  --border:#1e2d52;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Rajdhani',sans-serif;color:var(--ink);touch-action:none;user-select:none}
+input,textarea{user-select:text;touch-action:auto}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:#0d1226}
+::-webkit-scrollbar-thumb{background:#2a3a66;border-radius:2px}
+
+/* ---- SCREENS ---- */
+.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;overflow-x:hidden;background:radial-gradient(ellipse at 50% 20%,var(--bg2),var(--bg) 70%)}
+.screen.hidden{display:none!important}
+
+/* ---- HEADER ---- */
+.logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(26px,6vw,48px);letter-spacing:5px;color:var(--ink);text-shadow:0 0 18px rgba(79,242,255,.55),0 0 40px rgba(255,61,154,.25);margin-bottom:6px}
+.logo span{color:var(--cyan)}
+.tagline{font-size:12px;letter-spacing:4px;color:var(--dim);text-transform:uppercase;margin-bottom:28px}
+
+/* ---- CARD ---- */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:24px 28px;width:100%;max-width:420px;backdrop-filter:blur(6px)}
+.card h2{font-family:'Orbitron',sans-serif;font-size:16px;letter-spacing:3px;color:var(--cyan);margin-bottom:20px;text-align:center}
+
+/* ---- FORM ---- */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;letter-spacing:2px;color:var(--dim);margin-bottom:6px}
+.field input{width:100%;background:#0b0f22;border:1px solid var(--border);border-radius:4px;padding:10px 14px;color:var(--ink);font-family:'Rajdhani',sans-serif;font-size:15px;outline:none;transition:border .2s}
+.field input:focus{border-color:var(--cyan)}
+
+/* ---- BUTTONS ---- */
+.btn{font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;border:none;cursor:pointer;transition:transform .12s,box-shadow .12s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#060c1a;padding:12px 28px;border-radius:4px;box-shadow:0 0 18px rgba(79,242,255,.35);width:100%;margin-top:6px}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--dim);padding:10px 20px;border-radius:4px}
+.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan)}
+.btn-danger{background:linear-gradient(135deg,#ff3d3d,#c00);color:#fff;padding:10px 20px;border-radius:4px}
+.btn-gem{background:linear-gradient(135deg,#22c55e,#166534);color:#fff;padding:10px 20px;border-radius:4px;font-size:11px}
+.btn-diamond{background:linear-gradient(135deg,var(--diamond),var(--diamond2));color:#fff;padding:10px 20px;border-radius:4px;font-size:11px}
+.btn-sm{padding:7px 14px;font-size:10px;border-radius:3px}
+
+.link-btn{background:none;border:none;color:var(--cyan);font-family:'Rajdhani',sans-serif;font-size:14px;cursor:pointer;text-decoration:underline}
+
+.err{color:#ff4f4f;font-size:13px;margin-top:10px;text-align:center;min-height:18px}
+.suc{color:var(--green);font-size:13px;margin-top:10px;text-align:center;min-height:18px}
+
+/* ---- CURRENCY ---- */
+.currency-bar{display:flex;gap:12px;align-items:center;justify-content:flex-end;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--border)}
+.cur-chip{display:flex;align-items:center;gap:6px;font-family:'Orbitron',sans-serif;font-size:13px;background:#0b0f22;border:1px solid var(--border);padding:5px 12px;border-radius:20px}
+.gem-icon{color:#22c55e}
+.dia-icon{color:var(--diamond)}
+
+/* ---- LOBBY ---- */
+#lobbyScreen{justify-content:flex-start;overflow-y:auto}
+.lobby-wrap{width:100%;max-width:900px;padding:20px 16px 40px;margin:0 auto}
+.lobby-nav{display:flex;gap:8px;margin-bottom:22px;border-bottom:1px solid var(--border);padding-bottom:12px;flex-wrap:wrap}
+.nav-btn{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;background:transparent;border:none;color:var(--dim);cursor:pointer;padding:6px 14px;border-radius:3px;transition:all .2s}
+.nav-btn.active,.nav-btn:hover{color:var(--cyan);background:rgba(79,242,255,.08)}
+.section-title{font-family:'Orbitron',sans-serif;font-size:14px;letter-spacing:3px;color:var(--cyan);margin-bottom:16px}
+
+/* ---- SHIP CARDS ---- */
+.ships-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.ship-card{background:var(--bg3);border:2px solid var(--border);border-radius:8px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.ship-card:hover{border-color:var(--cyan);box-shadow:0 0 14px rgba(79,242,255,.2)}
+.ship-card.selected{border-color:var(--cyan);box-shadow:0 0 20px rgba(79,242,255,.35)}
+.ship-card.locked{opacity:.55;cursor:not-allowed}
+.ship-canvas{width:80px;height:80px;display:block;margin:0 auto 10px}
+.ship-name{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;color:var(--ink);margin-bottom:6px}
+.ship-stats{font-size:12px;color:var(--dim);line-height:1.8}
+.ship-price{font-size:12px;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:4px}
+.lock-badge{position:absolute;top:6px;right:8px;font-size:18px}
+.owned-badge{position:absolute;top:6px;right:8px;color:var(--green);font-size:16px}
+
+/* ---- STAT BARS ---- */
+.stat-row{display:flex;align-items:center;gap:6px;margin:3px 0;font-size:11px;color:var(--dim)}
+.stat-bar{flex:1;height:4px;background:#1e2d52;border-radius:2px;overflow:hidden}
+.stat-fill{height:100%;border-radius:2px;transition:width .4s}
+
+/* ---- ADMIN PANEL ---- */
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:580px){.admin-grid{grid-template-columns:1fr}}
+.admin-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:16px}
+.admin-card h3{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;color:var(--magenta);margin-bottom:14px}
+.user-table{width:100%;border-collapse:collapse;font-size:13px}
+.user-table th{text-align:left;font-size:10px;letter-spacing:2px;color:var(--dim);padding:6px 8px;border-bottom:1px solid var(--border)}
+.user-table td{padding:7px 8px;border-bottom:1px solid #111a33}
+.code-list{max-height:160px;overflow-y:auto}
+.code-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #111a33;font-size:13px;gap:8px}
+.code-used{color:var(--dim);text-decoration:line-through}
+
+/* ---- RECHARGE ---- */
+.recharge-list{display:flex;flex-direction:column;gap:10px}
+.recharge-item{display:flex;align-items:center;justify-content:space-between;background:#0b0f22;border:1px solid var(--border);border-radius:4px;padding:12px}
+.recharge-item.pending{border-color:var(--amber)}
+.recharge-item.done{border-color:var(--green);opacity:.6}
+
+/* ---- GAME CANVAS ---- */
+#gameScreen{background:var(--bg);z-index:20}
+#gameCanvas{display:block;max-width:100%;max-height:100%}
+.game-hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:10px 14px;background:rgba(7,9,20,.7);border-bottom:1px solid var(--border);z-index:21;pointer-events:none}
+.hud-block{font-family:'Orbitron',sans-serif}
+.hud-label{font-size:8px;letter-spacing:2px;color:var(--dim);margin-bottom:2px}
+.hud-val{font-size:16px;color:var(--cyan);text-shadow:0 0 6px rgba(79,242,255,.5)}
+.hud-val.mag{color:var(--magenta)}
+.hud-val.amb{color:var(--amber)}
+.lives{display:flex;gap:5px;margin-top:2px}
+.life-dot{width:9px;height:9px;background:var(--magenta);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);box-shadow:0 0 5px var(--magenta)}
+.life-dot.off{background:#2a3050;box-shadow:none}
+.hp-bar-wrap{margin-top:4px;height:4px;width:100px;background:#1e2d52;border-radius:2px;overflow:hidden}
+.hp-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#ff3d9a,#ff6fb8);transition:width .3s}
+
+.touch-ctrl{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-between;padding:20px;z-index:22;pointer-events:none}
+.stick-zone{width:110px;height:110px;border-radius:50%;border:1px solid #2a3a66;background:var(--panel);position:relative;pointer-events:all}
+.stick-knob{width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#7ff8ff,#2fd4d9);position:absolute;top:32px;left:32px;box-shadow:0 0 12px rgba(79,242,255,.5)}
+.fire-btn{width:80px;height:80px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8fc0,var(--magenta));border:1px solid #6a1f45;box-shadow:0 0 18px rgba(255,61,154,.5);pointer-events:all;font-family:'Orbitron',sans-serif;color:#1a0510;font-size:10px;letter-spacing:2px;cursor:pointer}
+.esc-btn{position:fixed;top:52px;right:14px;z-index:22;font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;background:var(--panel);border:1px solid var(--border);color:var(--dim);padding:6px 12px;border-radius:3px;cursor:pointer}
+.wave-banner{position:fixed;top:42%;left:50%;transform:translate(-50%,-50%);font-family:'Orbitron',sans-serif;font-size:clamp(22px,5vw,38px);letter-spacing:6px;color:var(--amber);text-shadow:0 0 20px rgba(255,176,32,.6);opacity:0;pointer-events:none;z-index:23;text-align:center}
+.pause-overlay{position:fixed;inset:0;z-index:24;background:rgba(7,9,20,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.pause-overlay.hidden{display:none!important}
+.go-overlay{position:fixed;inset:0;z-index:25;background:rgba(7,9,20,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.go-overlay.hidden{display:none!important}
+.go-score{font-family:'Orbitron',sans-serif;font-size:48px;color:var(--magenta);text-shadow:0 0 16px rgba(255,61,154,.6)}
+.go-reward{font-size:14px;color:var(--green)}
+
+/* ---- TOAST ---- */
+.toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#0d1226;border:1px solid var(--cyan);color:var(--ink);padding:10px 20px;border-radius:20px;font-size:14px;z-index:99;opacity:0;transition:opacity .3s;white-space:nowrap}
+
+/* ---- tabs ---- */
+.tabs{display:flex;gap:0;margin-bottom:16px;border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.tab{flex:1;padding:9px 6px;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1px;background:transparent;border:none;color:var(--dim);cursor:pointer;transition:all .2s;text-align:center}
+.tab.active{background:rgba(79,242,255,.12);color:var(--cyan)}
+
+.sep{width:100%;height:1px;background:var(--border);margin:16px 0}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div class="screen" id="authScreen">
+  <div class="logo">VOID <span>RUNNER</span></div>
+  <div class="tagline">Cuộc Chiến Vành Đai Ngoài</div>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('login')">ĐĂNG NHẬP</button>
+      <button class="tab" onclick="switchTab('register')">TẠO TÀI KHOẢN</button>
+    </div>
+    <div id="loginForm">
+      <div class="field"><label>TÊN ĐĂNG NHẬP</label><input id="li_user" type="text" placeholder="Nhập tên đăng nhập" autocomplete="username"></div>
+      <div class="field"><label>MẬT KHẨU</label><input id="li_pass" type="password" placeholder="Nhập mật khẩu" autocomplete="current-password"></div>
+      <button class="btn btn-primary" onclick="doLogin()">ĐĂNG NHẬP</button>
+      <div class="err" id="li_err"></div>
+    </div>
+    <div id="registerForm" class="hidden">
+      <div class="field"><label>TÊN ĐĂNG NHẬP</label><input id="rg_user" type="text" placeholder="3-16 ký tự" autocomplete="username"></div>
+      <div class="field"><label>MẬT KHẨU</label><input id="rg_pass" type="password" placeholder="Tối thiểu 4 ký tự" autocomplete="new-password"></div>
+      <div class="field"><label>XÁC NHẬN MẬT KHẨU</label><input id="rg_pass2" type="password" placeholder="Nhập lại mật khẩu"></div>
+      <button class="btn btn-primary" onclick="doRegister()">TẠO TÀI KHOẢN</button>
+      <div class="err" id="rg_err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LOBBY SCREEN ===== -->
+<div class="screen hidden" id="lobbyScreen">
+  <div style="width:100%;background:var(--panel);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5;flex-shrink:0">
+    <div style="font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:2px">VOID <span style="color:var(--cyan)">RUNNER</span></div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="cur-chip"><span class="gem-icon">💎</span><span id="gemDisplay">0</span></div>
+      <div class="cur-chip"><span class="dia-icon">💠</span><span id="diaDisplay">0</span></div>
+      <span id="userLabel" style="font-size:13px;color:var(--dim)"></span>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">THOÁT</button>
+    </div>
+  </div>
+
+  <div class="lobby-wrap">
+    <div class="lobby-nav">
+      <button class="nav-btn active" onclick="showTab('ships')">🚀 CHỌN TÀU</button>
+      <button class="nav-btn" onclick="showTab('shop')">🏪 CỬA HÀNG</button>
+      <button class="nav-btn" onclick="showTab('recharge')">💳 NẠP TIỀN</button>
+      <button class="nav-btn" onclick="showTab('code')">🎁 NHẬP CODE</button>
+      <button class="nav-btn" id="adminNavBtn" onclick="showTab('admin')" style="display:none">⚙️ ADMIN</button>
+    </div>
+
+    <!-- SHIPS TAB -->
+    <div id="tab_ships">
+      <div class="section-title">CHỌN TÀU CHIẾN</div>
+      <div class="ships-grid" id="shipsGrid"></div>
+      <div style="margin-top:24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-primary" style="max-width:200px" onclick="startGame()">🚀 XUẤT PHÁT</button>
+        <div style="font-size:13px;color:var(--dim)">Tàu đã chọn: <span id="selectedShipName" style="color:var(--cyan)">–</span></div>
+      </div>
+    </div>
+
+    <!-- SHOP TAB -->
+    <div id="tab_shop" class="hidden">
+      <div class="section-title">CỬA HÀNG</div>
+      <div class="ships-grid" id="shopGrid"></div>
+    </div>
+
+    <!-- RECHARGE TAB -->
+    <div id="tab_recharge" class="hidden">
+      <div class="section-title">NẠP THẺ CÀO</div>
+      <div class="card" style="max-width:460px">
+        <div class="field"><label>MẠNG DI ĐỘNG</label>
+          <select id="rc_network" style="width:100%;background:#0b0f22;border:1px solid var(--border);border-radius:4px;padding:10px 14px;color:var(--ink);font-size:15px;outline:none">
+            <option value="viettel">Viettel</option><option value="mobifone">Mobifone</option><option value="vinaphone">Vinaphone</option>
+          </select>
+        </div>
+        <div class="field"><label>MỆNH GIÁ</label>
+          <select id="rc_amount" style="width:100%;background:#0b0f22;border:1px solid var(--border);border-radius:4px;padding:10px 14px;color:var(--ink);font-size:15px;outline:none">
+            <option value="10000">10,000đ → 100 💠</option>
+            <option value="20000">20,000đ → 220 💠</option>
+            <option value="50000">50,000đ → 600 💠</option>
+            <option value="100000">100,000đ → 1,300 💠</option>
+            <option value="200000">200,000đ → 2,800 💠</option>
+            <option value="500000">500,000đ → 7,500 💠</option>
+          </select>
+        </div>
+        <div class="field"><label>SỐ SERI THẺ</label><input id="rc_serial" type="text" placeholder="Nhập số serial thẻ"></div>
+        <div class="field"><label>MÃ THẺ</label><input id="rc_pin" type="text" placeholder="Nhập mã thẻ"></div>
+        <button class="btn btn-primary" onclick="submitRecharge()">GỬI YÊU CẦU NẠP</button>
+        <div class="err" id="rc_err"></div>
+        <div class="suc" id="rc_suc"></div>
+      </div>
+      <div class="sep"></div>
+      <div class="section-title" style="margin-top:0">LỊCH SỬ NẠP</div>
+      <div id="myRechargeList"></div>
+    </div>
+
+    <!-- CODE TAB -->
+    <div id="tab_code" class="hidden">
+      <div class="section-title">NHẬP MÃ QUÀ TẶNG</div>
+      <div class="card" style="max-width:400px">
+        <div class="field"><label>MÃ CODE</label><input id="codeInput" type="text" placeholder="Nhập mã code kim cương"></div>
+        <button class="btn btn-primary" onclick="redeemCode()">ĐỔI CODE</button>
+        <div class="err" id="code_err"></div>
+        <div class="suc" id="code_suc"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN TAB -->
+    <div id="tab_admin" class="hidden">
+      <div class="section-title" style="color:var(--magenta)">⚙️ BẢNG QUẢN TRỊ</div>
+      <div class="admin-grid">
+
+        <!-- USERS -->
+        <div class="admin-card" style="grid-column:1/-1">
+          <h3>👥 QUẢN LÝ NGƯỜI DÙNG</h3>
+          <div style="overflow-x:auto">
+          <table class="user-table" id="adminUserTable">
+            <thead><tr><th>USERNAME</th><th>💎 GEM</th><th>💠 DIA</th><th>TÀU</th><th>BẮN/s</th><th>MÁU MAX</th><th>THAO TÁC</th></tr></thead>
+            <tbody id="adminUserBody"></tbody>
+          </table>
+          </div>
+        </div>
+
+        <!-- CODE MANAGER -->
+        <div class="admin-card">
+          <h3>🎁 TẠO MÃ CODE KIM CƯƠNG</h3>
+          <div class="field"><label>PHẦN THƯỞNG 💠</label><input id="adm_codeDia" type="number" value="100" placeholder="Số kim cương"></div>
+          <div class="field"><label>GHI CHÚ</label><input id="adm_codeNote" type="text" placeholder="Mô tả code..."></div>
+          <button class="btn btn-diamond" onclick="adminCreateCode()">TẠO CODE</button>
+          <div class="suc" id="adm_codeSuc"></div>
+          <div class="sep"></div>
+          <div class="code-list" id="adminCodeList"></div>
+        </div>
+
+        <!-- RECHARGE APPROVAL -->
+        <div class="admin-card">
+          <h3>💳 DUYỆT NẠP THẺ</h3>
+          <div id="adminRechargeList"></div>
+        </div>
+
+        <!-- SHIP STATS CONFIG -->
+        <div class="admin-card" style="grid-column:1/-1">
+          <h3>🚀 CHỈNH SỬA CHỈ SỐ TÀU</h3>
+          <div style="font-size:12px;color:var(--dim);margin-bottom:12px">Tốc độ bắn (viên/giây), máu tối đa — áp dụng toàn server</div>
+          <div id="adminShipConfig"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div class="screen hidden" id="gameScreen" style="background:#070914;justify-content:center;align-items:center">
+  <canvas id="gameCanvas"></canvas>
+  <div class="game-hud">
+    <div class="hud-block">
+      <div class="hud-label">ĐIỂM</div>
+      <div class="hud-val" id="g_score">0</div>
+    </div>
+    <div class="hud-block" style="text-align:center">
+      <div class="hud-label">CHẶNG</div>
+      <div class="hud-val mag" id="g_wave">1</div>
+    </div>
+    <div class="hud-block" style="text-align:right">
+      <div class="hud-label">MẠNG / MÁU</div>
+      <div class="lives" id="g_lives" style="justify-content:flex-end"></div>
+      <div class="hp-bar-wrap"><div class="hp-bar-fill" id="g_hpBar"></div></div>
+    </div>
+  </div>
+  <button class="esc-btn" onclick="pauseGame()">⏸ ESC</button>
+  <div class="wave-banner" id="waveBanner"></div>
+  <div class="touch-ctrl" id="touchCtrl" style="display:none">
+    <div class="stick-zone" id="stickZone"><div class="stick-knob" id="stickKnob"></div></div>
+    <button class="fire-btn" id="fireBtn">BẮN</button>
+  </div>
+  <div class="pause-overlay hidden" id="pauseOverlay">
+    <div class="logo" style="font-size:28px">TẠM DỪNG</div>
+    <button class="btn btn-primary" style="max-width:200px" onclick="resumeGame()">▶ TIẾP TỤC</button>
+    <button class="btn btn-ghost" style="max-width:200px" onclick="quitGame()">🏠 VỀ SẢNH</button>
+  </div>
+  <div class="go-overlay hidden" id="goOverlay">
+    <div class="logo" style="font-size:26px;color:var(--magenta)">TÀU ĐÃ NỔ</div>
+    <div class="go-score" id="go_score">0</div>
+    <div class="hud-label" style="letter-spacing:3px">ĐIỂM CUỐI CÙNG</div>
+    <div class="go-reward" id="go_reward"></div>
+    <button class="btn btn-primary" style="max-width:200px;margin-top:10px" onclick="restartGame()">CHƠI LẠI</button>
+    <button class="btn btn-ghost" style="max-width:200px" onclick="quitGame()">🏠 VỀ SẢNH</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// DATABASE (localStorage)
+// ============================================================
+const DB = {
+  get(k){try{return JSON.parse(localStorage.getItem('vr_'+k))||null}catch{return null}},
+  set(k,v){localStorage.setItem('vr_'+k,JSON.stringify(v))},
+  del(k){localStorage.removeItem('vr_'+k)}
+};
+
+function getUsers(){return DB.get('users')||{}}
+function setUsers(u){DB.set('users',u)}
+function getCodes(){return DB.get('codes')||{}}
+function setCodes(c){DB.set('codes',c)}
+function getRecharges(){return DB.get('recharges')||[]}
+function setRecharges(r){DB.set('recharges',r)}
+function getShipConfig(){return DB.get('shipConfig')||{}}
+function setShipConfig(c){DB.set('shipConfig',c)}
+
+// SEED ADMIN
+(function(){
+  const users=getUsers();
+  if(!users['admin']){
+    users['admin']={
+      username:'admin',password:'admin123',
+      isAdmin:true, gem:9999, diamond:9999,
+      ownedShips:['fighter','nova','specter','titan','phantom','vortex','ghost','apex'],
+      selectedShip:'fighter', joinDate:Date.now()
+    };
+    setUsers(users);
+  }
+})();
+
+// ============================================================
+// SHIPS CATALOG
+// ============================================================
+const SHIPS = [
+  {
+    id:'fighter', name:'FIGHTER', rarity:'THƯỜNG',
+    color:'#4ff2ff', accentColor:'#ff3d9a',
+    baseFireRate:0.18, baseMaxHp:100, baseSpeed:300,
+    free:true, gemPrice:0, diaPrice:0,
+    drawFn: function(ctx,x,y,flicker){
+      ctx.save(); ctx.translate(x,y);
+      ctx.strokeStyle=this.color; ctx.fillStyle='rgba(10,14,30,.95)'; ctx.lineWidth=2; ctx.shadowColor=this.color; ctx.shadowBlur=14;
+      ctx.beginPath(); ctx.moveTo(0,-20); ctx.lineTo(14,16); ctx.lineTo(0,7); ctx.lineTo(-14,16); ctx.closePath(); ctx.fill(); ctx.stroke();
+      if(flicker){ctx.fillStyle=this.accentColor; ctx.shadowColor=this.accentColor; ctx.beginPath(); ctx.moveTo(-5,12); ctx.lineTo(5,12); ctx.lineTo(0,12+flicker); ctx.closePath(); ctx.fill();}
+      ctx.restore();
+    }
+  },
+  {
+    id:'nova', name:'NOVA', rarity:'PHỔ THÔNG',
+    color:'#22c55e', accentColor:'#ffb020',
+    baseFireRate:0.14, baseMaxHp:130, baseSpeed:280,
+    free:false, gemPrice:500, diaPrice:0,
+    drawFn: function(ctx,x,y,flicker){
+      ctx.save(); ctx.translate(x,y);
+      ctx.strokeStyle=this.color; ctx.fillStyle='rgba(10,14,30,.95)'; ctx.lineWidth=2; ctx.shadowColor=this.color; ctx.shadowBlur=14;
+      ctx.beginPath(); ctx.moveTo(0,-22); ctx.lineTo(8,0); ctx.lineTo(17,18); ctx.lineTo(0,10); ctx.lineTo(-17,18); ctx.lineTo(-8,0); ctx.closePath(); ctx.fill(); ctx.stroke();
+      if(flicker){ctx.fillStyle=this.accentColor; ctx.shadowColor=this.accentColor; ctx.beginPath(); ctx.moveTo(-4,12); ctx.lineTo(4,12); ctx.lineTo(0,12+flicker); ctx.closePath(); ctx.fill();}
+      ctx.restore();
+    }
+  },
+  {
+    id:'specter', name:'SPECTER', rarity:'QUÝ',
+    color:'#a78bfa', accentColor:'#ff6fb8',
+    baseFireRate:0.11, baseMaxHp:90, baseSpeed:360,
+    free:false, gemPrice:0, diaPrice:80,
+    drawFn: function(ctx,x,y,flicker){
+      ctx.save(); ctx.translate(x,y);
+      ctx.strokeStyle=this.color; ctx.fillStyle='rgba(10,8,30,.95)'; ctx.lineWidth=2; ctx.shadowColor=this.color; ctx.shadowBlur=18;
+      ctx.beginPath(); ctx.moveTo(0,-24); ctx.lineTo(6,-8); ctx.lineTo(18,16); ctx.lineTo(0,6); ctx.lineTo(-18,16); ctx.lineTo(-6,-8); ctx.closePath(); ctx.fill(); ctx.stroke();
+      // wings
+      ctx.beginPath(); ctx.moveTo(0,-5); ctx.lineTo(22,10); ctx.lineTo(14,20); ctx.moveTo(0,-5); ctx.lineTo(-22,10); ctx.lineTo(-14,20); ctx.stroke();
+      if(flicker){ctx.fillStyle=this.accentColor; ctx.shadowColor=this.accentColor; ctx.beginPath(); ctx.moveTo(-4,8); ctx.lineTo(4,8); ctx.lineTo(0,8+flicker); ctx.closePath(); ctx.fill();}
+      ctx.restore();
+    }
+  },
+  {
+    id:'titan', name:'TITAN', rarity:'QUÝ',
+    color:'#f97316', accentColor:'#ffb020',
+    baseFireRate:0.22, baseMaxHp:200, baseSpeed:240,
+    free:false, gemPrice:1200, diaPrice:0,
+    drawFn: function(ctx,x,y,flicker){
+      ctx.save(); ctx.translate(x,y);
+      ctx.strokeStyle=this.color; ctx.fillStyle='rgba(20,10,5,.95)'; ctx.lineWidth=2.5; ctx.shadowColor=this.color; ctx.shadowBlur=16;
+      // body
+      ctx.beginPath(); ctx.moveTo(0,-22); ctx.lineTo(18,8); ctx.lineTo(12,22); ctx.lineTo(-12,22); ctx.lineTo(-18,8); ctx.closePath(); ctx.fill(); ctx.stroke();
+      // side guns
+      ctx.strokeStyle=this.color; ctx.lineWidth=2;
+      ctx.strokeRect(-24,-2,8,12); ctx.strokeRect(16,-2,8,12);
+      if(flicker){ctx.fillStyle=this.accentColor; ctx.shadowColor=this.accentColor; ctx.beginPath(); ctx.moveTo(-6,18); ctx.lineTo(6,18); ctx.lineTo(0,18+flicker); ctx.closePath(); ctx.fill();}
+      ctx.restore();
+    }
+  },
+  {
+    id:'phantom', name:'PHANTOM', rarity:'SỬ THI',
+    color:'#ec4899', accentColor:'#a78bfa',
+    baseFireRate:0.10, baseMaxHp:110, baseSpeed:400,
+    free:false, gemPrice:0, diaPrice:200,
+    drawFn: function(ctx,x,y,flicker){
+      ctx.save(); ctx.translate(x,y);
+      ctx.strokeStyle=this.color; ctx.fillStyle='rgba(15,5,25,.95)'; ctx.lineWidth=2; ctx.shadowColor=this.color; ctx.shadowBlur=22;
+      ctx.beginPath(); ctx.moveTo(0,-28); ctx.lineTo(4,-12); ctx.lineTo(20,14); ctx.lineTo(10,8); ctx.lineTo(0,14); ctx.lineTo(-10,8); ctx.lineTo(-20,14); ctx.lineTo(-4,-12); ctx.closePath(); ctx.fill(); ctx.stroke();
+      // inner glow
+      ctx.globalAlpha=.3; ctx.fillStyle=this.color;
+      ctx.beginPath(); ctx.moveTo(0,-16); ctx.lineTo(8,4); ctx.lineTo(0,10); ctx.lineTo(-8,4); ctx.closePath(); ctx.fill();
+      ctx.globalAlpha=1;
+      if(flicker){ctx.fillStyle=this.accentColor; ctx.shadowColor=this.accentColor; ctx.beginPath(); ctx.moveTo(-3,10); ctx.lineTo(3,10); ctx.lineTo(0,10+flicker); ctx.closePath(); ctx.fill();}
+      ctx.restore();
+    }
+  },
+  {
+    id:'vortex', name:'VORTEX', rarity:'SỬ THI',
+    color:'#06b6d4', accentColor:'#22d3ee',
+    baseFireRate:0.09, baseMaxHp:120, baseSpeed:350,
+    free:false, gemPrice:0, diaPrice:300,
+    drawFn: function(ctx,x,y,flicker){
+      ctx.save(); ctx.translate(x,y);
+      ctx.strokeStyle=this.color; ctx.fillStyle='rgba(0,12,20,.95)'; ctx.lineWidth=2; ctx.shadowColor=this.color; ctx.shadowBlur=20;
+      // diamond hull
+      ctx.beginPath(); ctx.moveTo(0,-26); ctx.lineTo(10,-6); ctx.lineTo(22,14); ctx.lineTo(0,22); ctx.lineTo(-22,14); ctx.lineTo(-10,-6); ctx.closePath(); ctx.fill(); ctx.stroke();
+      // rings
+      ctx.globalAlpha=.5;
+      ctx.beginPath(); ctx.ellipse(0,0,14,8,0,0,Math.PI*2); ctx.stroke();
+      ctx.globalAlpha=1;
+      if(flicker){ctx.fillStyle=this.accentColor; ctx.shadowColor=this.accentColor; ctx.beginPath(); ctx.arc(0,18,3+flicker/4,0,Math.PI*2); ctx.fill();}
+      ctx.restore();
+    }
+  },
+  {
+    id:'ghost', name:'GHOST', rarity:'HUYỀN THOẠI',
+    color:'#94a3b8', accentColor:'#e2e8f0',
+    baseFireRate:0.08, baseMaxHp:150, baseSpeed:420,
+    free:false, gemPrice:0, diaPrice:500,
+    drawFn: function(ctx,x,y,flicker){
+      ctx.save(); ctx.translate(x,y);
+      ctx.strokeStyle=this.color; ctx.fillStyle='rgba(8,10,16,.95)'; ctx.lineWidth=2; ctx.shadowColor=this.color; ctx.shadowBlur=28;
+      // stealth shape
+      ctx.beginPath(); ctx.moveTo(0,-28); ctx.lineTo(3,-10); ctx.lineTo(28,4); ctx.lineTo(18,20); ctx.lineTo(0,12); ctx.lineTo(-18,20); ctx.lineTo(-28,4); ctx.lineTo(-3,-10); ctx.closePath(); ctx.fill(); ctx.stroke();
+      // cockpit
+      ctx.globalAlpha=.6; ctx.fillStyle=this.color;
+      ctx.beginPath(); ctx.ellipse(0,-6,5,8,0,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1;
+      if(flicker){ctx.fillStyle=this.accentColor; ctx.shadowColor=this.accentColor; ctx.beginPath(); ctx.moveTo(-5,12); ctx.lineTo(5,12); ctx.lineTo(0,12+flicker); ctx.closePath(); ctx.fill();}
+      ctx.restore();
+    }
+  },
+  {
+    id:'apex', name:'APEX', rarity:'TỐI THƯỢNG',
+    color:'#fbbf24', accentColor:'#f59e0b',
+    baseFireRate:0.07, baseMaxHp:180, baseSpeed:380,
+    free:false, gemPrice:0, diaPrice:1000,
+    drawFn: function(ctx,x,y,flicker){
+      ctx.save(); ctx.translate(x,y);
+      ctx.strokeStyle=this.color; ctx.fillStyle='rgba(20,15,0,.95)'; ctx.lineWidth=2.5; ctx.shadowColor=this.color; ctx.shadowBlur=30;
+      ctx.beginPath(); ctx.moveTo(0,-30); ctx.lineTo(6,-10); ctx.lineTo(26,10); ctx.lineTo(16,28); ctx.lineTo(0,18); ctx.lineTo(-16,28); ctx.lineTo(-26,10); ctx.lineTo(-6,-10); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.globalAlpha=.4; ctx.strokeStyle='#fffbeb';
+      ctx.beginPath(); ctx.moveTo(0,-16); ctx.lineTo(12,8); ctx.lineTo(0,14); ctx.lineTo(-12,8); ctx.closePath(); ctx.stroke();
+      ctx.globalAlpha=1;
+      if(flicker){ctx.fillStyle=this.accentColor; ctx.shadowColor=this.accentColor; ctx.beginPath(); ctx.moveTo(-7,16); ctx.lineTo(7,16); ctx.lineTo(0,16+flicker); ctx.closePath(); ctx.fill();}
+      ctx.restore();
+    }
+  }
+];
+
+const RARITY_COLOR = {'THƯỜNG':'#94a3b8','PHỔ THÔNG':'#22c55e','QUÝ':'#a78bfa','SỬ THI':'#f97316','HUYỀN THOẠI':'#ec4899','TỐI THƯỢNG':'#fbbf24'};
+const DIAMOND_REWARD = {10000:100,20000:220,50000:600,100000:1300,200000:2800,500000:7500};
+
+// ============================================================
+// SESSION
+// ============================================================
+let currentUser = null;
+
+function getUser(){ const u=getUsers(); return u[currentUser]||null; }
+function saveUser(data){ const u=getUsers(); u[data.username]=data; setUsers(u); }
+
+function updateCurrencyDisplay(){
+  const u=getUser(); if(!u) return;
+  document.getElementById('gemDisplay').textContent = u.gem||0;
+  document.getElementById('diaDisplay').textContent = u.diamond||0;
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+function switchTab(t){
+  document.getElementById('loginForm').classList.toggle('hidden', t!=='login');
+  document.getElementById('registerForm').classList.toggle('hidden', t!=='register');
+  document.querySelectorAll('#authScreen .tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='register')));
+}
+
+function doLogin(){
+  const u = document.getElementById('li_user').value.trim();
+  const p = document.getElementById('li_pass').value;
+  const users = getUsers();
+  if(!users[u]){document.getElementById('li_err').textContent='Tài khoản không tồn tại';return;}
+  if(users[u].password!==p){document.getElementById('li_err').textContent='Sai mật khẩu';return;}
+  document.getElementById('li_err').textContent='';
+  currentUser = u;
+  enterLobby();
+}
+
+function doRegister(){
+  const u = document.getElementById('rg_user').value.trim();
+  const p = document.getElementById('rg_pass').value;
+  const p2 = document.getElementById('rg_pass2').value;
+  const err = document.getElementById('rg_err');
+  if(!u||u.length<3||u.length>16){err.textContent='Tên 3-16 ký tự';return;}
+  if(p.length<4){err.textContent='Mật khẩu tối thiểu 4 ký tự';return;}
+  if(p!==p2){err.textContent='Mật khẩu không khớp';return;}
+  const users=getUsers();
+  if(users[u]){err.textContent='Tên đã tồn tại';return;}
+  users[u]={username:u,password:p,isAdmin:false,gem:0,diamond:0,ownedShips:['fighter'],selectedShip:'fighter',joinDate:Date.now()};
+  setUsers(users);
+  err.style.color='var(--green)'; err.textContent='Tạo thành công! Đăng nhập...';
+  setTimeout(()=>{ document.getElementById('li_user').value=u; switchTab('login'); }, 1000);
+}
+
+function doLogout(){
+  currentUser=null;
+  show('authScreen');
+}
+
+// ============================================================
+// LOBBY
+// ============================================================
+function enterLobby(){
+  const u=getUser();
+  document.getElementById('userLabel').textContent = u.username + (u.isAdmin?' 👑':'');
+  document.getElementById('adminNavBtn').style.display = u.isAdmin?'':'none';
+  show('lobbyScreen');
+  showTab('ships');
+  updateCurrencyDisplay();
+}
+
+function showTab(name){
+  ['ships','shop','recharge','code','admin'].forEach(t=>{
+    document.getElementById('tab_'+t).classList.toggle('hidden',t!==name);
+  });
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(name)||b.getAttribute('onclick')?.includes("'"+name+"'")));
+  if(name==='ships') renderShips();
+  if(name==='shop') renderShop();
+  if(name==='recharge') renderMyRecharges();
+  if(name==='admin') renderAdmin();
+}
+
+// --- SHIP DRAWING MINI CANVAS ---
+function drawShipPreview(canvas, ship){
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ship.drawFn(ctx, W/2, H/2+4, 0);
+}
+
+function renderShips(){
+  const u = getUser();
+  const grid = document.getElementById('shipsGrid');
+  grid.innerHTML='';
+  SHIPS.forEach(ship=>{
+    const owned = u.ownedShips.includes(ship.id);
+    const sel = u.selectedShip === ship.id;
+    const cfg = getShipConfig()[ship.id]||{};
+    const fr = cfg.fireRate!==undefined?cfg.fireRate:ship.baseFireRate;
+    const hp = cfg.maxHp!==undefined?cfg.maxHp:ship.baseMaxHp;
+    const card = document.createElement('div');
+    card.className = 'ship-card'+(sel?' selected':'')+((!owned&&!ship.free)?'':'')+' ';
+    const c = document.createElement('canvas');
+    c.width=80; c.height=80; c.className='ship-canvas';
+    card.appendChild(c);
+    const nameEl = document.createElement('div'); nameEl.className='ship-name';
+    nameEl.innerHTML = `<span style="color:${RARITY_COLOR[ship.rarity]}">${ship.rarity}</span><br>${ship.name}`;
+    card.appendChild(nameEl);
+    const stats = document.createElement('div'); stats.className='ship-stats';
+    stats.innerHTML=`
+      <div class="stat-row"><span>TỐC ĐỘ BẮN</span><div class="stat-bar"><div class="stat-fill" style="width:${Math.min(100,(1/fr)/15*100)}%;background:${ship.color}"></div></div></div>
+      <div class="stat-row"><span>MÁU</span><div class="stat-bar"><div class="stat-fill" style="width:${hp/2}%;background:var(--magenta)"></div></div></div>
+      <div class="stat-row"><span>TỐC ĐỘ</span><div class="stat-bar"><div class="stat-fill" style="width:${ship.baseSpeed/5}%;background:var(--amber)"></div></div></div>`;
+    card.appendChild(stats);
+    if(owned){
+      const badge = document.createElement('div'); badge.className='owned-badge'; badge.textContent='✓';
+      card.appendChild(badge);
+      card.onclick = ()=>{ u.selectedShip=ship.id; saveUser(u); renderShips(); document.getElementById('selectedShipName').textContent=ship.name; };
+    } else {
+      // price tag
+      const price = document.createElement('div'); price.className='ship-price';
+      if(ship.gemPrice>0) price.innerHTML=`<span class="gem-icon">💎</span>${ship.gemPrice} GEM`;
+      else if(ship.diaPrice>0) price.innerHTML=`<span class="dia-icon">💠</span>${ship.diaPrice} KIM CƯƠNG`;
+      card.appendChild(price);
+      const lock = document.createElement('div'); lock.className='lock-badge'; lock.textContent='🔒';
+      card.appendChild(lock);
+    }
+    if(sel) document.getElementById('selectedShipName').textContent=ship.name;
+    grid.appendChild(card);
+    setTimeout(()=>drawShipPreview(c, ship),50);
+  });
+}
+
+function renderShop(){
+  const u = getUser();
+  const grid = document.getElementById('shopGrid');
+  grid.innerHTML='';
+  SHIPS.filter(s=>!s.free).forEach(ship=>{
+    const owned = u.ownedShips.includes(ship.id);
+    const card = document.createElement('div');
+    card.className = 'ship-card'+(owned?' selected':'');
+    const c = document.createElement('canvas');
+    c.width=80; c.height=80; c.className='ship-canvas'; card.appendChild(c);
+    const nameEl = document.createElement('div'); nameEl.className='ship-name';
+    nameEl.innerHTML=`<span style="color:${RARITY_COLOR[ship.rarity]}">${ship.rarity}</span><br>${ship.name}`;
+    card.appendChild(nameEl);
+    if(owned){
+      const b=document.createElement('div'); b.className='owned-badge'; b.textContent='✓'; card.appendChild(b);
+      const txt=document.createElement('div'); txt.style.cssText='font-size:12px;color:var(--green);margin-top:8px'; txt.textContent='ĐÃ SỞ HỮU'; card.appendChild(txt);
+    } else {
+      const price=document.createElement('div'); price.className='ship-price';
+      if(ship.gemPrice>0){
+        price.innerHTML=`<span class="gem-icon">💎</span>${ship.gemPrice}`;
+        const btn=document.createElement('button'); btn.className='btn btn-gem btn-sm'; btn.style.marginTop='8px'; btn.textContent='MUA GEM';
+        btn.onclick=()=>buyShip(ship,'gem');
+        card.appendChild(price); card.appendChild(btn);
+      } else {
+        price.innerHTML=`<span class="dia-icon">💠</span>${ship.diaPrice}`;
+        const btn=document.createElement('button'); btn.className='btn btn-diamond btn-sm'; btn.style.marginTop='8px'; btn.textContent='MUA KIM CƯƠNG';
+        btn.onclick=()=>buyShip(ship,'diamond');
+        card.appendChild(price); card.appendChild(btn);
+      }
+    }
+    grid.appendChild(card);
+    setTimeout(()=>drawShipPreview(c,ship),50);
+  });
+}
+
+function buyShip(ship, currency){
+  const u=getUser();
+  if(u.ownedShips.includes(ship.id)){toast('Bạn đã sở hữu tàu này!');return;}
+  const cost = currency==='gem'?ship.gemPrice:ship.diaPrice;
+  const bal = currency==='gem'?(u.gem||0):(u.diamond||0);
+  if(bal<cost){toast('⚠️ Không đủ '+(currency==='gem'?'💎 Gem':'💠 Kim cương')+'!');return;}
+  if(currency==='gem') u.gem=(u.gem||0)-cost;
+  else u.diamond=(u.diamond||0)-cost;
+  u.ownedShips.push(ship.id);
+  saveUser(u); updateCurrencyDisplay();
+  toast('🎉 Đã mua tàu '+ship.name+'!');
+  renderShop();
+}
+
+// ============================================================
+// CODE REDEMPTION
+// ============================================================
+function redeemCode(){
+  const code = document.getElementById('codeInput').value.trim().toUpperCase();
+  const err=document.getElementById('code_err'), suc=document.getElementById('code_suc');
+  err.textContent=''; suc.textContent='';
+  const codes=getCodes();
+  if(!codes[code]){err.textContent='Mã không hợp lệ!';return;}
+  if(codes[code].usedBy){err.textContent='Mã đã được sử dụng!';return;}
+  const u=getUser();
+  const reward=codes[code].diamond||0;
+  codes[code].usedBy=currentUser; codes[code].usedAt=Date.now();
+  setCodes(codes);
+  u.diamond=(u.diamond||0)+reward;
+  saveUser(u); updateCurrencyDisplay();
+  suc.textContent=`✅ Nhận được ${reward} 💠 Kim cương!`;
+  document.getElementById('codeInput').value='';
+}
+
+// ============================================================
+// RECHARGE
+// ============================================================
+function submitRecharge(){
+  const network=document.getElementById('rc_network').value;
+  const amount=parseInt(document.getElementById('rc_amount').value);
+  const serial=document.getElementById('rc_serial').value.trim();
+  const pin=document.getElementById('rc_pin').value.trim();
+  const err=document.getElementById('rc_err'), suc=document.getElementById('rc_suc');
+  err.textContent=''; suc.textContent='';
+  if(!serial||!pin){err.textContent='Vui lòng điền đầy đủ thông tin!';return;}
+  const recharges=getRecharges();
+  const dup=recharges.find(r=>r.serial===serial&&r.pin===pin);
+  if(dup){err.textContent='Thẻ này đã được gửi!';return;}
+  recharges.push({id:Date.now()+'',username:currentUser,network,amount,serial,pin,status:'pending',createdAt:Date.now()});
+  setRecharges(recharges);
+  suc.textContent='✅ Đã gửi yêu cầu! Chờ admin duyệt.';
+  document.getElementById('rc_serial').value=''; document.getElementById('rc_pin').value='';
+  renderMyRecharges();
+}
+
+function renderMyRecharges(){
+  const list=document.getElementById('myRechargeList');
+  const recharges=getRecharges().filter(r=>r.username===currentUser);
+  if(!recharges.length){list.innerHTML='<div style="color:var(--dim);font-size:13px">Chưa có giao dịch nào.</div>';return;}
+  list.innerHTML=recharges.slice().reverse().map(r=>`
+    <div class="recharge-item ${r.status}">
+      <div>
+        <div style="font-size:14px">${r.network.toUpperCase()} · ${r.amount.toLocaleString()}đ</div>
+        <div style="font-size:12px;color:var(--dim)">Serial: ${r.serial}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:${r.status==='pending'?'var(--amber)':r.status==='approved'?'var(--green)':'#ff4f4f'}">${r.status==='pending'?'⏳ Chờ duyệt':r.status==='approved'?'✅ Đã duyệt':'❌ Từ chối'}</div>
+        ${r.status==='approved'?`<div style="font-size:12px;color:var(--diamond)">+${DIAMOND_REWARD[r.amount]} 💠</div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+// ============================================================
+// ADMIN PANEL
+// ============================================================
+function renderAdmin(){
+  const u=getUser(); if(!u?.isAdmin) return;
+  renderAdminUsers(); renderAdminCodes(); renderAdminRecharges(); renderAdminShipConfig();
+}
+
+function renderAdminUsers(){
+  const users=getUsers();
+  const tbody=document.getElementById('adminUserBody');
+  tbody.innerHTML=Object.values(users).map(u=>{
+    const ship=SHIPS.find(s=>s.id===u.selectedShip)||SHIPS[0];
+    const cfg=getShipConfig()[ship.id]||{};
+    return `<tr>
+      <td>${u.username}${u.isAdmin?' 👑':''}</td>
+      <td><input type="number" value="${u.gem||0}" style="width:70px;background:#0b0f22;border:1px solid var(--border);color:var(--ink);border-radius:3px;padding:3px 6px;font-size:13px" onchange="adminSetCurrency('${u.username}','gem',this.value)"></td>
+      <td><input type="number" value="${u.diamond||0}" style="width:70px;background:#0b0f22;border:1px solid var(--border);color:var(--ink);border-radius:3px;padding:3px 6px;font-size:13px" onchange="adminSetCurrency('${u.username}','diamond',this.value)"></td>
+      <td style="color:${ship.color}">${ship.name}</td>
+      <td style="color:var(--cyan)">${(1/(cfg.fireRate||ship.baseFireRate)).toFixed(1)}/s</td>
+      <td style="color:var(--magenta)">${cfg.maxHp||ship.baseMaxHp}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="adminResetUser('${u.username}')">RESET</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function adminSetCurrency(username, type, val){
+  const users=getUsers();
+  if(!users[username]) return;
+  users[username][type]=parseInt(val)||0;
+  setUsers(users);
+  if(username===currentUser) updateCurrencyDisplay();
+}
+
+function adminResetUser(username){
+  if(!confirm('Reset tài khoản '+username+'?')) return;
+  const users=getUsers();
+  if(!users[username]) return;
+  users[username].gem=0; users[username].diamond=0;
+  setUsers(users);
+  renderAdminUsers(); toast('Đã reset '+username);
+}
+
+function adminCreateCode(){
+  const dia=parseInt(document.getElementById('adm_codeDia').value)||0;
+  const note=document.getElementById('adm_codeNote').value.trim();
+  const codes=getCodes();
+  const id='VR'+Date.now().toString(36).toUpperCase();
+  codes[id]={diamond:dia,note,createdAt:Date.now(),usedBy:null};
+  setCodes(codes);
+  document.getElementById('adm_codeSuc').textContent='✅ Tạo code: '+id;
+  renderAdminCodes();
+}
+
+function renderAdminCodes(){
+  const codes=getCodes();
+  const list=document.getElementById('adminCodeList');
+  const keys=Object.keys(codes);
+  if(!keys.length){list.innerHTML='<div style="color:var(--dim);font-size:12px">Chưa có code nào.</div>';return;}
+  list.innerHTML=keys.slice().reverse().map(k=>{
+    const c=codes[k];
+    return `<div class="code-item ${c.usedBy?'code-used':''}">
+      <span style="font-family:'Orbitron',sans-serif;font-size:11px">${k}</span>
+      <span style="color:var(--diamond)">+${c.diamond} 💠</span>
+      <span style="font-size:11px;color:var(--dim)">${c.usedBy?'Used:'+c.usedBy:'Chưa dùng'}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderAdminRecharges(){
+  const recharges=getRecharges();
+  const pending=recharges.filter(r=>r.status==='pending');
+  const el=document.getElementById('adminRechargeList');
+  if(!pending.length){el.innerHTML='<div style="color:var(--dim);font-size:13px">Không có yêu cầu nào.</div>';return;}
+  el.innerHTML=pending.map(r=>`
+    <div class="recharge-item pending" style="flex-direction:column;align-items:flex-start;gap:8px">
+      <div>
+        <div style="font-size:14px">${r.username} · ${r.network.toUpperCase()} · ${r.amount.toLocaleString()}đ</div>
+        <div style="font-size:12px;color:var(--dim)">Serial: ${r.serial} | Pin: ${r.pin}</div>
+        <div style="font-size:12px;color:var(--amber)">+${DIAMOND_REWARD[r.amount]} 💠</div>
+      </div>
+      <div class="row">
+        <button class="btn btn-gem btn-sm" onclick="adminApproveRecharge('${r.id}',true)">✅ DUYỆT</button>
+        <button class="btn btn-danger btn-sm" onclick="adminApproveRecharge('${r.id}',false)">❌ TỪ CHỐI</button>
+      </div>
+    </div>`).join('');
+}
+
+function adminApproveRecharge(id, approve){
+  const recharges=getRecharges();
+  const r=recharges.find(x=>x.id===id); if(!r) return;
+  r.status=approve?'approved':'rejected'; r.resolvedAt=Date.now();
+  if(approve){
+    const users=getUsers();
+    if(users[r.username]){
+      users[r.username].diamond=(users[r.username].diamond||0)+DIAMOND_REWARD[r.amount];
+      setUsers(users);
+    }
+  }
+  setRecharges(recharges);
+  if(currentUser===r.username) updateCurrencyDisplay();
+  renderAdminRecharges();
+  toast(approve?'✅ Đã duyệt':'❌ Đã từ chối');
+}
+
+function renderAdminShipConfig(){
+  const cfg=getShipConfig();
+  const el=document.getElementById('adminShipConfig');
+  el.innerHTML=SHIPS.map(ship=>{
+    const c=cfg[ship.id]||{};
+    const fr=c.fireRate!==undefined?c.fireRate:ship.baseFireRate;
+    const hp=c.maxHp!==undefined?c.maxHp:ship.baseMaxHp;
+    const fps=(1/fr).toFixed(1);
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
+      <div style="font-family:'Orbitron',sans-serif;font-size:11px;color:${ship.color};min-width:80px">${ship.name}</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+        <span style="color:var(--dim)">Bắn/s:</span>
+        <input type="number" value="${fps}" step="0.1" min="0.5" max="20" style="width:60px;background:#0b0f22;border:1px solid var(--border);color:var(--cyan);border-radius:3px;padding:4px 6px;font-size:13px" onchange="adminSetShipStat('${ship.id}','fireRate',1/parseFloat(this.value)||0.18)">
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+        <span style="color:var(--dim)">Máu max:</span>
+        <input type="number" value="${hp}" step="10" min="10" max="500" style="width:70px;background:#0b0f22;border:1px solid var(--border);color:var(--magenta);border-radius:3px;padding:4px 6px;font-size:13px" onchange="adminSetShipStat('${ship.id}','maxHp',parseInt(this.value)||100)">
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="adminResetShip('${ship.id}')">RESET</button>
+    </div>`;
+  }).join('');
+}
+
+function adminSetShipStat(shipId, stat, val){
+  const cfg=getShipConfig();
+  if(!cfg[shipId]) cfg[shipId]={};
+  cfg[shipId][stat]=val;
+  setShipConfig(cfg);
+  toast('Đã cập nhật '+shipId);
+}
+
+function adminResetShip(shipId){
+  const cfg=getShipConfig();
+  delete cfg[shipId];
+  setShipConfig(cfg);
+  renderAdminShipConfig();
+  toast('Đã reset chỉ số '+shipId);
+}
+
+// ============================================================
+// GAME ENGINE
+// ============================================================
+const gc = document.getElementById('gameCanvas');
+const gctx = gc.getContext('2d');
+let GW, GH, GDPR;
+let gState='idle',gFrame=0;
+let gScore,gWave,gLives,gHp,gMaxHp,gFireRate,gFireCooldown;
+let gPlayer,gBullets,gEBullets,gEnemies,gParticles,gStars;
+let gSpawnQueue,gSpawnTimer,gWaveTimer,gShakeT;
+let gKeys={}, gFiring=false, gTouchVec={x:0,y:0};
+let gCurrentShip;
+let gAnimId;
+
+function resizeGame(){
+  GDPR=Math.min(window.devicePixelRatio||1,2);
+  GW=window.innerWidth; GH=window.innerHeight;
+  gc.width=GW*GDPR; gc.height=GH*GDPR;
+  gc.style.width=GW+'px'; gc.style.height=GH+'px';
+  gctx.setTransform(GDPR,0,0,GDPR,0,0);
+}
+
+function initGameStars(){
+  gStars=[];
+  [[40,20,1,.35],[26,45,1.6,.55],[14,80,2.2,.85]].forEach(([n,sp,sz,a])=>{
+    for(let i=0;i<n;i++) gStars.push({x:Math.random()*GW,y:Math.random()*GH,speed:sp,size:sz,alpha:a});
+  });
+}
+
+function startGame(){
+  const u=getUser();
+  if(!u.selectedShip||!u.ownedShips.includes(u.selectedShip)) u.selectedShip='fighter';
+  gCurrentShip=SHIPS.find(s=>s.id===u.selectedShip)||SHIPS[0];
+  const cfg=getShipConfig()[gCurrentShip.id]||{};
+  gFireRate=cfg.fireRate!==undefined?cfg.fireRate:gCurrentShip.baseFireRate;
+  gMaxHp=cfg.maxHp!==undefined?cfg.maxHp:gCurrentShip.baseMaxHp;
+  const speed=gCurrentShip.baseSpeed;
+
+  gScore=0; gWave=1; gLives=3; gHp=gMaxHp;
+  gBullets=[]; gEBullets=[]; gEnemies=[]; gParticles=[];
+  gFireCooldown=0; gShakeT=0; gFrame=0;
+  gPlayer={x:GW/2,y:GH-90,r:14,speed,blinkT:0,alive:true};
+  initGameStars();
+  updateGameHUD();
+  startGameWave(1);
+
+  resizeGame();
+  show('gameScreen');
+
+  const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
+  document.getElementById('touchCtrl').style.display=isTouch?'flex':'none';
+  setupGameInput();
+
+  gState='playing';
+  if(gAnimId) cancelAnimationFrame(gAnimId);
+  let last=performance.now();
+  function loop(now){
+    const dt=Math.min((now-last)/1000,.033); last=now;
+    gameUpdate(dt); gameDraw();
+    gAnimId=requestAnimationFrame(loop);
+  }
+  gAnimId=requestAnimationFrame(loop);
+}
+
+function setupGameInput(){
+  document.onkeydown=e=>{
+    gKeys[e.key.toLowerCase()]=true;
+    if(e.key===' '){gFiring=true;e.preventDefault();}
+    if(e.key.toLowerCase()==='p'||e.key==='Escape') toggleGamePause();
+  };
+  document.onkeyup=e=>{ gKeys[e.key.toLowerCase()]=false; if(e.key===' ') gFiring=false; };
+}
+
+// touch stick
+let stickActive=false,stickId=null,stickOrigin={x:0,y:0};
+document.getElementById('stickZone').addEventListener('touchstart',e=>{
+  const t=e.changedTouches[0]; stickActive=true; stickId=t.identifier;
+  const r=document.getElementById('stickZone').getBoundingClientRect();
+  stickOrigin={x:r.left+r.width/2,y:r.top+r.height/2}; e.preventDefault();
+},{passive:false});
+window.addEventListener('touchmove',e=>{
+  for(const t of e.changedTouches){
+    if(stickActive&&t.identifier===stickId){
+      let dx=t.clientX-stickOrigin.x, dy=t.clientY-stickOrigin.y;
+      const mx=40, dist=Math.min(Math.hypot(dx,dy),mx), ang=Math.atan2(dy,dx);
+      dx=Math.cos(ang)*dist; dy=Math.sin(ang)*dist;
+      document.getElementById('stickKnob').style.left=(32+dx)+'px';
+      document.getElementById('stickKnob').style.top=(32+dy)+'px';
+      gTouchVec={x:dx/mx,y:dy/mx};
+    }
+  }
+},{passive:false});
+window.addEventListener('touchend',e=>{
+  for(const t of e.changedTouches){
+    if(t.identifier===stickId){
+      stickActive=false; stickId=null; gTouchVec={x:0,y:0};
+      document.getElementById('stickKnob').style.cssText='width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#7ff8ff,#2fd4d9);position:absolute;top:32px;left:32px;box-shadow:0 0 12px rgba(79,242,255,.5)';
+    }
+  }
+});
+document.getElementById('fireBtn').ontouchstart=e=>{gFiring=true;e.preventDefault();};
+document.getElementById('fireBtn').ontouchend=e=>{gFiring=false;e.preventDefault();};
+
+function updateGameHUD(){
+  document.getElementById('g_score').textContent=gScore;
+  document.getElementById('g_wave').textContent=gWave;
+  const row=document.getElementById('g_lives'); row.innerHTML='';
+  for(let i=0;i<3;i++){const d=document.createElement('div');d.className='life-dot'+(i<gLives?'':' off');row.appendChild(d);}
+  document.getElementById('g_hpBar').style.width=Math.max(0,gHp/gMaxHp*100)+'%';
+}
+
+function startGameWave(n){
+  gWave=n; gSpawnQueue=6+n*3; gSpawnTimer=0; gWaveTimer=0;
+  const banner=document.getElementById('waveBanner');
+  banner.textContent='CHẶNG '+n; banner.style.transition='none'; banner.style.opacity='1'; banner.style.transform='translate(-50%,-50%) scale(1)';
+  setTimeout(()=>{ banner.style.transition='opacity 1.2s ease,transform 1.2s ease'; banner.style.opacity='0'; banner.style.transform='translate(-50%,-50%) scale(1.3)'; },800);
+  updateGameHUD();
+}
+
+function spawnEnemy(){
+  const type=Math.random()<0.28?'shooter':Math.random()<0.5?'drifter':'bomber';
+  const r=type==='bomber'?18:type==='shooter'?15:12;
+  const hp=type==='bomber'?4:type==='shooter'?2:1;
+  gEnemies.push({x:40+Math.random()*(GW-80),y:-35,r,type,vx:(Math.random()-.5)*70,vy:55+gWave*4+Math.random()*30,hp,maxHp:hp,shootT:Math.random()*2,hue:type==='shooter'?330:type==='bomber'?30:190});
+}
+
+function spawnGParticles(x,y,color,n){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, sp=50+Math.random()*180;
+    gParticles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:.4+Math.random()*.4,t:0,color,size:2+Math.random()*2});
+  }
+}
+
+function gameUpdate(dt){
+  gFrame++;
+  gStars.forEach(s=>{ s.y+=s.speed*dt; if(s.y>GH){s.y=-2;s.x=Math.random()*GW;} });
+  if(gState!=='playing') return;
+
+  let dx=0,dy=0;
+  if(gKeys['arrowleft']||gKeys['a']) dx-=1;
+  if(gKeys['arrowright']||gKeys['d']) dx+=1;
+  if(gKeys['arrowup']||gKeys['w']) dy-=1;
+  if(gKeys['arrowdown']||gKeys['s']) dy+=1;
+  dx+=gTouchVec.x; dy+=gTouchVec.y;
+  const mag=Math.hypot(dx,dy); if(mag>1){dx/=mag;dy/=mag;}
+  gPlayer.x+=dx*gPlayer.speed*dt; gPlayer.y+=dy*gPlayer.speed*dt;
+  gPlayer.x=Math.max(20,Math.min(GW-20,gPlayer.x));
+  gPlayer.y=Math.max(GH*.3,Math.min(GH-20,gPlayer.y));
+
+  gFireCooldown-=dt;
+  if(gFiring&&gFireCooldown<=0&&gPlayer.alive){
+    const spread=gCurrentShip.id==='titan'?3:2;
+    for(let i=0;i<spread;i++) gBullets.push({x:gPlayer.x+(i-(spread-1)/2)*9,y:gPlayer.y-12,vy:-580,r:3});
+    gFireCooldown=gFireRate;
+  }
+
+  gSpawnTimer-=dt;
+  if(gSpawnQueue>0&&gSpawnTimer<=0){ spawnEnemy(); gSpawnQueue--; gSpawnTimer=Math.max(.3,.85-gWave*.025); }
+  if(gSpawnQueue===0&&gEnemies.length===0){ gWaveTimer+=dt; if(gWaveTimer>1.4) startGameWave(gWave+1); }
+
+  gBullets.forEach(b=>b.y+=b.vy*dt);
+  gBullets=gBullets.filter(b=>b.y>-20);
+  gEBullets.forEach(b=>{b.x+=b.vx*dt;b.y+=b.vy*dt;});
+  gEBullets=gEBullets.filter(b=>b.y<GH+20&&b.y>-20&&b.x>-20&&b.x<GW+20);
+
+  gEnemies.forEach(en=>{
+    en.x+=en.vx*dt; en.y+=en.vy*dt;
+    if(en.x<20||en.x>GW-20) en.vx*=-1;
+    if(en.type==='shooter'){ en.shootT-=dt;
+      if(en.shootT<=0&&en.y>0&&en.y<GH*.8){
+        const ang=Math.atan2(gPlayer.y-en.y,gPlayer.x-en.x);
+        gEBullets.push({x:en.x,y:en.y,vx:Math.cos(ang)*230,vy:Math.sin(ang)*230,r:5});
+        en.shootT=1.5+Math.random()*.8;
+      }
+    }
+    if(en.type==='bomber'&&en.y>GH*.3&&Math.random()<.003){
+      const ang=Math.atan2(gPlayer.y-en.y,gPlayer.x-en.x);
+      for(let i=-2;i<=2;i++) gEBullets.push({x:en.x,y:en.y,vx:Math.cos(ang+i*.35)*200,vy:Math.sin(ang+i*.35)*200,r:5});
+    }
+  });
+  gEnemies=gEnemies.filter(en=>en.y<GH+40);
+
+  gParticles.forEach(p=>{p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.92;p.vy*=.92;});
+  gParticles=gParticles.filter(p=>p.t<p.life);
+
+  // collisions bullets vs enemies
+  for(let i=gEnemies.length-1;i>=0;i--){
+    const en=gEnemies[i];
+    for(let j=gBullets.length-1;j>=0;j--){
+      const b=gBullets[j];
+      if(Math.hypot(en.x-b.x,en.y-b.y)<en.r+b.r){
+        gBullets.splice(j,1); en.hp--;
+        spawnGParticles(b.x,b.y,en.type==='shooter'?'#ff3d9a':en.type==='bomber'?'#ffb020':'#4ff2ff',4);
+        if(en.hp<=0){
+          const pts=en.type==='bomber'?250:en.type==='shooter'?150:80;
+          gScore+=pts; spawnGParticles(en.x,en.y,en.type==='shooter'?'#ff3d9a':en.type==='bomber'?'#ffb020':'#4ff2ff',18);
+          gEnemies.splice(i,1); gShakeT=.12; updateGameHUD();
+        }
+        break;
+      }
+    }
+  }
+
+  // player collisions
+  if(gPlayer.alive&&gPlayer.blinkT<=0){
+    for(let i=gEnemies.length-1;i>=0;i--){
+      if(Math.hypot(gEnemies[i].x-gPlayer.x,gEnemies[i].y-gPlayer.y)<gEnemies[i].r+gPlayer.r){
+        gEnemies.splice(i,1); hitPlayer(20+gWave*3); break;
+      }
+    }
+    for(let i=gEBullets.length-1;i>=0;i--){
+      if(Math.hypot(gEBullets[i].x-gPlayer.x,gEBullets[i].y-gPlayer.y)<gEBullets[i].r+gPlayer.r){
+        gEBullets.splice(i,1); hitPlayer(10); break;
+      }
+    }
+  }
+  if(gPlayer.blinkT>0) gPlayer.blinkT-=dt;
+  if(gShakeT>0) gShakeT-=dt;
+}
+
+function hitPlayer(dmg){
+  gHp-=dmg; spawnGParticles(gPlayer.x,gPlayer.y,'#ffb020',14); gShakeT=.2; gPlayer.blinkT=1.2;
+  if(gHp<=0){
+    gHp=0; gLives--;
+    if(gLives<=0){ gPlayer.alive=false; gameOver(); }
+    else { gHp=gMaxHp; toast('💥 Mất 1 mạng! Còn '+gLives+' mạng'); }
+  }
+  updateGameHUD();
+}
+
+function gameDraw(){
+  gctx.clearRect(0,0,GW,GH);
+  gctx.save();
+  if(gShakeT>0) gctx.translate((Math.random()-.5)*6*Math.min(gShakeT/.25,1),(Math.random()-.5)*6*Math.min(gShakeT/.25,1));
+
+  gStars.forEach(s=>{ gctx.globalAlpha=s.alpha; gctx.fillStyle='#bcd4ff'; gctx.fillRect(s.x,s.y,s.size,s.size); });
+  gctx.globalAlpha=1;
+
+  gParticles.forEach(p=>{ const a=1-p.t/p.life; gctx.globalAlpha=a; gctx.fillStyle=p.color; gctx.beginPath(); gctx.arc(p.x,p.y,p.size*a+.5,0,Math.PI*2); gctx.fill(); });
+  gctx.globalAlpha=1;
+
+  // player bullets
+  gBullets.forEach(b=>{
+    const g=gctx.createLinearGradient(b.x,b.y-12,b.x,b.y+4);
+    g.addColorStop(0,'rgba(79,242,255,0)'); g.addColorStop(1,'#9ffcff');
+    gctx.fillStyle=g; gctx.fillRect(b.x-2,b.y-12,4,16);
+  });
+
+  // enemy bullets
+  gEBullets.forEach(b=>{ gctx.fillStyle='#ff6fb8'; gctx.shadowColor='#ff3d9a'; gctx.shadowBlur=8; gctx.beginPath(); gctx.arc(b.x,b.y,b.r,0,Math.PI*2); gctx.fill(); gctx.shadowBlur=0; });
+
+  // enemies
+  gEnemies.forEach(en=>{
+    gctx.save(); gctx.translate(en.x,en.y);
+    const color=en.type==='shooter'?'#ff3d9a':en.type==='bomber'?'#ffb020':'#4ff2ff';
+    gctx.strokeStyle=color; gctx.fillStyle='rgba(10,14,30,.9)'; gctx.lineWidth=2; gctx.shadowColor=color; gctx.shadowBlur=12;
+    gctx.rotate(Math.PI);
+    if(en.type==='bomber'){
+      gctx.beginPath(); gctx.moveTo(0,-en.r); gctx.lineTo(en.r*.7,0); gctx.lineTo(en.r*.5,en.r); gctx.lineTo(-en.r*.5,en.r); gctx.lineTo(-en.r*.7,0); gctx.closePath();
+    } else {
+      gctx.beginPath(); gctx.moveTo(0,-en.r); gctx.lineTo(en.r*.85,en.r*.7); gctx.lineTo(0,en.r*.35); gctx.lineTo(-en.r*.85,en.r*.7); gctx.closePath();
+    }
+    gctx.fill(); gctx.stroke();
+    // hp bar
+    if(en.maxHp>1){
+      gctx.rotate(-Math.PI);
+      gctx.fillStyle='#1e2d52'; gctx.fillRect(-en.r,-en.r-10,en.r*2,4);
+      gctx.fillStyle=color; gctx.fillRect(-en.r,-en.r-10,en.r*2*(en.hp/en.maxHp),4);
+    }
+    gctx.restore();
+  });
+
+  // player ship
+  if(gPlayer.alive){
+    const blink=gPlayer.blinkT>0&&Math.floor(gFrame/4)%2===0;
+    if(!blink){
+      const flicker=gState==='playing'?(6+Math.random()*6):0;
+      gCurrentShip.drawFn(gctx,gPlayer.x,gPlayer.y,flicker);
+    }
+  }
+
+  gctx.restore();
+}
+
+function pauseGame(){ if(gState!=='playing') return; gState='paused'; document.getElementById('pauseOverlay').classList.remove('hidden'); }
+function resumeGame(){ gState='playing'; document.getElementById('pauseOverlay').classList.add('hidden'); }
+function toggleGamePause(){ if(gState==='playing') pauseGame(); else if(gState==='paused') resumeGame(); }
+
+function gameOver(){
+  gState='gameover';
+  const gemEarned=Math.floor(gScore/50+gWave*5);
+  const u=getUser(); u.gem=(u.gem||0)+gemEarned; saveUser(u); updateCurrencyDisplay();
+  document.getElementById('go_score').textContent=gScore;
+  document.getElementById('go_reward').textContent=`+${gemEarned} 💎 Gem`;
+  setTimeout(()=>document.getElementById('goOverlay').classList.remove('hidden'),600);
+}
+
+function restartGame(){ document.getElementById('goOverlay').classList.add('hidden'); startGame(); }
+function quitGame(){
+  document.onkeydown=null; document.onkeyup=null;
+  if(gAnimId) cancelAnimationFrame(gAnimId);
+  gState='idle';
+  document.getElementById('pauseOverlay').classList.add('hidden');
+  document.getElementById('goOverlay').classList.add('hidden');
+  updateCurrencyDisplay();
+  show('lobbyScreen');
+  renderShips();
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function show(id){
+  ['authScreen','lobbyScreen','gameScreen'].forEach(s=>document.getElementById(s).classList.toggle('hidden',s!==id));
+}
+
+function toast(msg,dur=2600){
+  const el=document.getElementById('toast'); el.textContent=msg; el.style.opacity='1';
+  clearTimeout(el._t); el._t=setTimeout(()=>el.style.opacity='0',dur);
+}
+</script>
+</body>
+</html>
